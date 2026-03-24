@@ -50,7 +50,6 @@ function TodoList() {
         }
     }, [newTask]);
 
-    // Allow adding task with Enter key
     const handleAddKeyDown = (e) => {
         if (e.key === 'Enter') handleAddTask();
     };
@@ -69,14 +68,15 @@ function TodoList() {
     }, [tasks, filter]);
 
     return (
-        <div className={`container ${darkMode ? 'dark-mode' : ''}`}>
+        <div className={`app-container ${darkMode ? 'dark-mode' : ''}`}>
             <h2>Todo List</h2>
-            <button className="toggle-btn" onClick={() => setDarkMode(!darkMode)}>
+
+            <button onClick={() => setDarkMode(!darkMode)}>
                 {darkMode ? 'Light Mode' : 'Dark Mode'}
             </button>
 
-            {/* Add Task Section */}
-            <div className="add-task">
+            {/* Add Task Section — uses .input-group from your CSS */}
+            <div className="input-group">
                 <input
                     type="text"
                     placeholder="Add a new task..."
@@ -92,50 +92,61 @@ function TodoList() {
                     <button
                         key={status}
                         onClick={() => setFilter(status)}
-                        className={filter === status ? 'active-filter' : ''}
+                        style={filter === status ? { backgroundColor: '#4CAF50', color: '#fff' } : {}}
                     >
                         {status}
                     </button>
                 ))}
             </div>
 
-            <ul className="task-list">
-                {filteredTasks.length === 0 && (
-                    <li className="empty-state">No tasks here!</li>
-                )}
-                {filteredTasks.map((task) => (
-                    <li key={task.id} className="task-item">
-                        <input
-                            type="checkbox"
-                            checked={task.completed}
-                            onChange={() => handleTaskChange(task.id, { completed: !task.completed })}
-                        />
-                        {editingId === task.id ? (
-                            <>
+            <div className="todo-container">
+                <ul>
+                    {filteredTasks.length === 0 && (
+                        <li>No tasks here!</li>
+                    )}
+                    {filteredTasks.map((task) => (
+                        <li key={task.id}>
+                            <div className="task-content">
                                 <input
-                                    type="text"
-                                    value={editText}
-                                    onChange={(e) => setEditText(e.target.value)}
-                                    onKeyDown={(e) => handleEditKeyDown(e, task.id)}
-                                    autoFocus
+                                    type="checkbox"
+                                    checked={task.completed}
+                                    onChange={() => handleTaskChange(task.id, { completed: !task.completed })}
                                 />
-                                <button onClick={() => handleEditSave(task.id)}>Save</button>
-                                <button onClick={() => setEditingId(null)}>Cancel</button>
-                            </>
-                        ) : (
-                            <>
-                                <span className={task.completed ? 'completed-task' : ''}>
-                                    {task.text}
-                                </span>
-                                <button onClick={() => { setEditingId(task.id); setEditText(task.text); }}>
-                                    Edit
-                                </button>
-                                <button onClick={() => handleDelete(task.id)}>Delete</button>
-                            </>
-                        )}
-                    </li>
-                ))}
-            </ul>
+                                {editingId === task.id ? (
+                                    <input
+                                        type="text"
+                                        value={editText}
+                                        onChange={(e) => setEditText(e.target.value)}
+                                        onKeyDown={(e) => handleEditKeyDown(e, task.id)}
+                                        autoFocus
+                                    />
+                                ) : (
+                                    <span className={task.completed ? 'completed-task' : ''}>
+                                        {task.text}
+                                    </span>
+                                )}
+                            </div>
+                            <div className="task-actions">
+                                {editingId === task.id ? (
+                                    <>
+                                        <button onClick={() => handleEditSave(task.id)}>Save</button>
+                                        <button onClick={() => setEditingId(null)}>Cancel</button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <button onClick={() => { setEditingId(task.id); setEditText(task.text); }}>
+                                            Edit
+                                        </button>
+                                        <button className="delete-btn" onClick={() => handleDelete(task.id)}>
+                                            Delete
+                                        </button>
+                                    </>
+                                )}
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+            </div>
         </div>
     );
 }
